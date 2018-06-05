@@ -19,6 +19,6 @@
 
 let appConfiguration = {
     SETTINGS_TABLE: 'iot-sim-settings',
-    SIM_LIMIT: 1000
+    SIM_LIMIT: 20000
 };
 module.exports = appConfiguration;

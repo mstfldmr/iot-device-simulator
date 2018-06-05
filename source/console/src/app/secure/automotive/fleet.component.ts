@@ -199,7 +199,7 @@ export class FleetComponent implements OnInit, OnDestroy { // implements LoggedI
 
     addVehicles(w: WidgetRequest) {
         this.provisionCountError = false;
-        if (w.count > 25) {
+        if (w.count > 1000) {
             this.provisionCountError = true;
             return;
         }

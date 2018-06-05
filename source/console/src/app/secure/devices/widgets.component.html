@@ -114,11 +114,11 @@
                                         <label for="imax" class="form-control-label">Number of widgets:</label>
                                         <input type="number" class="form-control form-control-line" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="count" id="count" required ngModel #count="ngModel" [(ngModel)]="widgetRequest.count">
                                         <div class="form-control-feedback">
-                                            <small>Number of widgets to create based on the device type. Up to 25 devices.</small>
+                                            <small>Number of widgets to create based on the device type. Up to 1000 devices.</small>
                                         </div>
                                     </div>
                                     <div class="alert alert-danger" *ngIf="provisionCountError">
-                                        <h3 class="text-danger"><i class="fa fa-exclamation-circle"></i> Oops!</h3> Your number of widgets to create must be <= 25.
+                                        <h3 class="text-danger"><i class="fa fa-exclamation-circle"></i> Oops!</h3> Your number of widgets to create must be <= 1000.
                                     </div>
                                 </form>
                             </div>

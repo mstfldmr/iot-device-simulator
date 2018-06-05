@@ -172,11 +172,11 @@ class DeviceManager {
         const _self = this;
         return new Promise((resolve, reject) => {
 
-            if (request.count > 25) {
+            if (request.count > 1000) {
                 return reject({
                     code: 400,
                     error: 'DeviceCreateLimitExceeded',
-                    message: 'Exceeded limit of 25 concurrent device creations per request.'
+                    message: 'Exceeded limit of 1000 concurrent device creations per request.'
                 });
             }
 

@@ -52,7 +52,7 @@ describe('DeviceManager', function() {
     const newDeviceExceed = {
         metadata: {},
         typeId: '8S2DzAk',
-        count: 26
+        count: 1001
     };
 
     const deviceType = {
@@ -546,7 +546,7 @@ describe('DeviceManager', function() {
                 expect(err).to.deep.equal({
                     code: 400,
                     error: 'DeviceCreateLimitExceeded',
-                    message: 'Exceeded limit of 25 concurrent device creations per request.'
+                    message: 'Exceeded limit of 1000 concurrent device creations per request.'
                 });
                 done();
             });

@@ -41,8 +41,8 @@ mkdir -p $dist_dir/routedata/routes
 echo "------------------------------------------------------------------------------"
 echo "[Packing] Templates"
 echo "------------------------------------------------------------------------------"
-echo "cp $template_dir/iot-device-simulator.yaml $dist_dir/iot-device-simulator.template"
-cp $template_dir/iot-device-simulator.yaml $dist_dir/iot-device-simulator.template
+echo "cp $template_dir/iot-device-simulator.template $dist_dir/iot-device-simulator.template"
+cp $template_dir/iot-device-simulator.template $dist_dir/iot-device-simulator.template
 
 echo "Updating code source bucket in template with $1"
 replace="s/%%BUCKET_NAME%%/$1/g"
