@@ -1,3 +1,7 @@
+## Modifications
+The original IoT Device Simulator from AWS is limited to run maximum 1000 simulations and user is restricted to add only 25 devices at a time. This modified version is rising these limits to 20000 and 1000.
+
+
 ## IoT Device Simulator
 IoT is a sprawling set of technologies and use cases that has no clear, single definition. Despite enormous advances, we’ve only seen a fraction of what the Internet revolution has yet to deliver. That’s because many powerful technological forces are now converging — poised to magnify, multiply, and exponentially increase the opportunities that software and the Internet can deliver by connecting the devices, or “things”, in the physical world around us. These devices are able to convert valuable information into digital data that provides increased visibility to businesses of how users interact with the world around them. The backend services required to process and uncover these valuable insights can be expensive to prove without a large pool of physical devices for full end to end integration setup or time-consuming development of scripts.  
 
