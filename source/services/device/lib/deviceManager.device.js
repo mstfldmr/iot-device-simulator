@@ -189,58 +189,97 @@ class DeviceManager {
             };
 
             _self._getDeviceType(ticket, request.typeId).then((dtype) => {
-                let _requestItems = [];
-                let _metadata = [];
 
-                for (let i = 0; i < request.count; i++) {
-                    let _metadata = {};
-                    _metadata = _self._generateDefaultMetadata(request.metadata, dtype.typeId);
-                    _requestItems.push({
-                        PutRequest: {
-                            Item: {
-                                userId: ticket.userid,
-                                id: shortid.generate(),
-                                metadata: _metadata,
-                                stage: 'provisioning',
-                                runs: 0,
-                                category: dtype.custom ? 'custom widget' : dtype.typeId,
-                                subCategory: dtype.name,
-                                typeId: dtype.typeId,
-                                createdAt: moment().utc().format(),
-                                updatedAt: moment().utc().format()
+                let total = request.count;
+                let num_batches = Math.ceil(total/25);
+                let remaining = total;
+                let completed_batches = 0;
+                let failed = false;
+
+                let _all_requestItems = [];
+
+                var i;
+                for (i = 0; i < num_batches; i++) {
+                    let _requestItems = [];
+                    let _metadata = [];
+
+                    let subtotal = (remaining>25) ? 25:remaining;
+                    remaining = remaining-subtotal;
+
+                    for (let i = 0; i < subtotal; i++) {
+                        let _metadata = {};
+                        _metadata = _self._generateDefaultMetadata(request.metadata, dtype.typeId);
+                        _requestItems.push({
+                            PutRequest: {
+                                Item: {
+                                    userId: ticket.userid,
+                                    id: shortid.generate(),
+                                    metadata: _metadata,
+                                    stage: 'provisioning',
+                                    runs: 0,
+                                    category: dtype.custom ? 'custom widget' : dtype.typeId,
+                                    subCategory: dtype.name,
+                                    typeId: dtype.typeId,
+                                    createdAt: moment().utc().format(),
+                                    updatedAt: moment().utc().format()
+                                }
                             }
-                        }
-                    });
-                }
-
-                params = {
-                    RequestItems: {},
-                    ReturnConsumedCapacity: 'TOTAL',
-                    ReturnItemCollectionMetrics: 'SIZE'
-                };
-                params.RequestItems[`${process.env.DEVICES_TBL}`] = _requestItems;
-
-                let docClient = new AWS.DynamoDB.DocumentClient(_self.dynamoConfig);
-                docClient.batchWrite(params, function(err, data) {
-                    if (err) {
-                        Logger.error(Logger.levels.INFO, err);
-                        return reject({
-                            code: 500,
-                            error: 'DeviceBatchCreateFailure',
-                            message: `Error occurred while attempting to batch create devices for user ${ticket.userid}.`
                         });
                     }
+                    _all_requestItems = _all_requestItems.concat(_requestItems);
 
-                    _self._queueBulkSimulatorActions(_requestItems, 0).then((resp) => {
-                        resolve({
-                            processedItems: _requestItems.length,
-                            consumedCapacity: data.ConsumedCapacity.CapacityUnits
-                        });
-                    }).catch((err) => {
-                        return reject(err);
+                    params = {
+                        RequestItems: {},
+                        ReturnConsumedCapacity: 'TOTAL',
+                        ReturnItemCollectionMetrics: 'SIZE'
+                    };
+                    params.RequestItems[`${process.env.DEVICES_TBL}`] = _requestItems;
+
+                    let docClient = new AWS.DynamoDB.DocumentClient(_self.dynamoConfig);
+
+                    // batchWrite is limited with 25 items at once
+                    // https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_BatchWriteItem.html#API_BatchWriteItem_RequestSyntax
+                    docClient.batchWrite(params, function(err, data) {
+                        completed_batches++;
+
+                        if (err) {
+                            console.log('######## MUSTAFA ######## error occured');
+                            Logger.error(Logger.levels.INFO, err);
+                            failed = true;
+                            complete(0);
+                        } else{
+                            console.log('######## MUSTAFA ######## completed ' + i + '. batch');
+                            complete(data.ConsumedCapacity.CapacityUnits);
+                        }
                     });
 
-                });
+                }
+
+                function complete(consumed) {
+                    if(completed_batches >= num_batches){
+                        console.log('######## MUSTAFA ######## completed_batches: ' + completed_batches + ' failed: ' + failed);
+
+                        if(failed){
+                            return reject({
+                                code: 500,
+                                error: 'DeviceBatchCreateFailure',
+                                message: `Error occurred while attempting to batch create devices for user ${ticket.userid}.`
+                            });
+                        }
+                        
+                        _self._queueBulkSimulatorActions(_all_requestItems, 0).then((resp) => {
+
+                            resolve({
+                                processedItems: total,
+                                consumedCapacity: consumed
+                            });
+                        }).catch((err) => {
+                            return reject(err);
+                        });
+                    }
+                }
+
+
             }).catch((err) => {
                 reject(err);
             });

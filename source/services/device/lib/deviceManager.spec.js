@@ -528,7 +528,7 @@ describe('DeviceManager', function() {
             });
         });
 
-        it('should return error information when device count exceeds 25 limit', function(done) {
+        it('should return error information when device count exceeds 1000 limit', function(done) {
 
             let ticket = {
                 auth_status: 'authorized',

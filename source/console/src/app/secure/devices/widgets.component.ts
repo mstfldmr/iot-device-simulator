@@ -261,7 +261,7 @@ export class WidgetsComponent implements OnInit, OnDestroy { // implements Logge
                 this.blockUI.stop();
                 swal(
                     'Oops...',
-                    'Something went wrong! Unable to create the new device.',
+                    'Something went wrong! Unable to create the new device: ' + JSON.stringify(err),
                     'error');
                 this.logger.error('error occurred calling createDevice api, show message');
                 this.logger.error(err);
